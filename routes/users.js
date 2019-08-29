@@ -7,60 +7,13 @@ const passport = require('passport');
 const passportConf = require('../passport');  //this will let passport.authenticate() find strategy 
 const UserControllers = require('../controllers/users');
 
-// router.get('/secret', passport.authenticate('jwt', {session: false}), (req, res, next) => { //export req, res, next to controller fcn
-//   console.log('made it here!');
-
-// }
+router.get('/secret', passport.authenticate('jwt', {session: false}), (req, res, next) => { //export req, res, next to controller fcn
+  res.json({success: 'success'})
+})
 
 router.post('/login', passport.authenticate('local', {session: false}), UserControllers.login);
 
 router.post('/register', UserControllers.register);
-
-//user signin route
-router.post("/signin", (req, res, next) => {
-  db.select('*').from('users').where('email', req.body.email)
-    .then(user => {
-      if (user.length < 1) {
-        return res.status(401).json({
-          message: "Auth failed"
-        });
-      }
-        if (req.body.password != user[0].password) {
-          return res.status(401).json({
-            message: "Auth failed"
-          });
-        }
-        else {
-          const token = jwt.sign(
-            {
-              email: user[0].email,
-              userId: user[0].username
-            },
-            //secret key
-            "secret key",
-            {
-                expiresIn: "1h"
-            }
-          );
-          return res.status(200).json({
-            message: "Auth successful",
-            user: {
-            	username: user[0].username,
-            	email: user[0].email,
-              token: token,
-            }
-          });
-        }
-        res.status(401).json({
-          message: "Auth failed"
-        });
-      });
-    })
-.catch = (err) => {
-  res.status(500).json({
-    error: err
-  });
-}
 
 
 //get likes from specific user route

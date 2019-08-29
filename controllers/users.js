@@ -1,6 +1,5 @@
 const JWT = require('jsonwebtoken')
 const jwt = require('jwt-simple') //token creation package 
-const createUser = require('../actions/signUp')
 const bcrypt = require('bcrypt')
 const db = require('../db/index');
 
@@ -15,9 +14,12 @@ signToken = user => {
 }
 
 const login = (req, res, next) => {
-	console.log('I made it here');
+	const {email, username, password} = req.body;
+	if (!email || !username || !password) {
+		res.status(422).send({error: 'enter email and password'})
+	}
 	let token = signToken(req.user); 
-	res.send({token: token}) 
+	res.json({token: signToken({email, username, password})})
 }
 
 //create user and send token to client
@@ -47,13 +49,10 @@ const register = (req, res, next) => {
 			res.json({token: signToken({email, username, password})}) //return token to client
 		})
 		.catch(error => {
-			console.log('error was HERE');
-			console.log(error);
 			res.json({error: error})
 		})
 	})
 	.catch(error => {
-		console.log('ERROR WAS CAUGHT IN CATCH');
 		res.json({error}); //error hashing password 
 	})
 }
