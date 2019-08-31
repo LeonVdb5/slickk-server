@@ -2,28 +2,32 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const knex = require('knex')
-const db = knex({
-  client: 'pg',
-  connection: {
-    host: 'slickk.cnai4blomaps.us-east-2.rds.amazonaws.com',
-    port: '5432',
-    user: 'slickk',
-    password: 'Okcthunder35',
-    database: 'slickk1'
-  }
-});
+const db = require('./db/index');
 
-// app.use(bodyParser.urlencoded({extended: false}));
-app.use(cors())
+//passport 
+const passport = require('passport');
+const requireAuth = passport.authenticate('jwt', {session: false})
+
+const routes = express.Router(); 
+
+// app.use(passport.initialize());
+app.use(cookieParser());
+app.use(cors({
+	origin: 'http://localhost:3001',
+	credentials: true
+}));
+// app.use(passport.initialize());
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 
 //routers 
-const productRoutes = require('./api/routes/products');
-const hairstyleRoutes = require('./api/routes/hairstyles');
-const commentRoutes = require('./api/routes/comments');
-const userRoutes = require('./api/routes/users');
+const productRoutes = require('./routes/products');
+const hairstyleRoutes = require('./routes/hairstyles');
+const commentRoutes = require('./routes/comments');
+const userRoutes = require('./routes/users');
 
 
 app.use('/products', productRoutes);
