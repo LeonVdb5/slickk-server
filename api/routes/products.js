@@ -16,7 +16,7 @@ const db = knex({
 
 // get all products
 router.get("/", (req, res, next) => {
-  db.raw("SELECT posts.pid, COUNT (likes.pid) AS numlikes, post_type, posts.username, time_posted, description, name, product_type, price, affiliated_link, hairstyle, hair_length, hair_type, face_shape FROM posts LEFT OUTER JOIN likes ON posts.pid=likes.pid GROUP BY posts.pid")
+  db.raw("SELECT posts.pid, COUNT (likes.pid) AS numlikes, post_type, posts.username, TO_CHAR(time_posted, 'Mon dd, YYYY') AS time_posted, description, name, product_type, price, affiliated_link, hairstyle, hair_length, hair_type, face_shape FROM posts LEFT OUTER JOIN likes ON posts.pid=likes.pid GROUP BY posts.pid ORDER BY numlikes DESC")
     .then(products => {
     	res.status(200).json(products.rows);
     })
