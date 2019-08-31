@@ -7,14 +7,34 @@ const passport = require('passport');
 const passportConf = require('../passport');  //this will let passport.authenticate() find strategy 
 const UserControllers = require('../controllers/users');
 
-router.get('/secret', passport.authenticate('jwt', {session: false}), (req, res, next) => { //export req, res, next to controller fcn
-  res.json({success: 'success'})
-})
+// router.get('/secret', passport.authenticate('jwt', {session: false}), (req, res, next) => { //export req, res, next to controller fcn
+//   res.json({success: 'success'})
+// })
+
+// router.get('/updatePassword', (req, res, next) => {
+//   const saltRounds = 10;
+//   bcrypt.hash('compsci', saltRounds)
+//   .then(hashedPassword => {
+//     db('users').where('password', 'compsci')
+//     .update({
+//       password: hashedPassword,
+//     })
+//     .catch(error => res.json({error: error}))
+//   })
+//   .then(() => {
+//     res.status(200).json({message: 'updated passwords'})
+//   })
+// }) 
 
 router.post('/login', passport.authenticate('local', {session: false}), UserControllers.login);
 
 router.post('/register', UserControllers.register);
 
+// //route for UI to check if cookies exist 
+router.get('/status', passport.authenticate('jwt', {session: false}), UserControllers.checkAuth);
+
+//route to clear cookie, effectively signing out a user 
+// router.get('/signout', passport.authenticate('jwt', {session: false}), UserControllers.signOut);
 
 //get likes from specific user route
 router.post("/likes", (req, res, next) => {
@@ -29,7 +49,6 @@ router.post("/likes", (req, res, next) => {
       });
     });
 });
-
 
 //add a like from a user in the database
 router.post("/post/like", (req, res, next) => {
@@ -50,7 +69,6 @@ router.post("/post/like", (req, res, next) => {
     });
   });
 });
-
 
 //delete a like from a user in database
 router.delete("/post/like", (req, res, next) => {
@@ -93,9 +111,6 @@ router.post("/post/comment", (req, res, next) => {
     });
   });
 });
-
-//J
-
 
 
 module.exports = router;

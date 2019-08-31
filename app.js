@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const knex = require('knex')
 const db = require('./db/index');
 
@@ -11,10 +12,13 @@ const requireAuth = passport.authenticate('jwt', {session: false})
 
 const routes = express.Router(); 
 
-// const passportService = require **
-
-app.use(passport.initialize());
-app.use(cors());
+// app.use(passport.initialize());
+app.use(cookieParser());
+app.use(cors({
+	origin: 'http://localhost:3001',
+	credentials: true
+}));
+// app.use(passport.initialize());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 

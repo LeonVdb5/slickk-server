@@ -9,11 +9,22 @@ const bcrypt = require('bcrypt');
 //local strategy 
 const LocalStrategy = require ('passport-local').Strategy;
 
+//need to write manual extractFromCookies to get jwt token from cookies
+const cookieExtrator = req => {
+	//check if cookies exist 
+	let token = null;
+	if (req && req.cookies) {
+		token = req.cookies['access_token'];
+	}
+	return token
+}
+
 //options for JwtStrategy 
 const opts = {
-	jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken('authorization'), //where is token contained (i.e., in the authorization field of the header)
+	jwtFromRequest: cookieExtrator, //where is token contained (i.e., in the authorization field of the header)
 	secretOrKey: 'temp'
 }
+
 
 // json web token strategy 
 passport.use(new JwtStrategy(opts, (payload, done) => { //payload is an object literal containing the unecoded payload data
@@ -42,12 +53,14 @@ passport.use(new JwtStrategy(opts, (payload, done) => { //payload is an object l
 
 passport.use(new LocalStrategy(
  (username, password, done) => {
-	//Find user given email 
+	//Find user given username
 	db('users').where('username', username)
 	.then(validUser => { 
+		// console.log(validUser);
 		if (validUser.length == 0){
-			return done(null, false)
+			return done(null, false) //user not found
 		}
+		console.log(password);
 		bcrypt.compare(password, validUser[0].password)
 		.then(validPassword => {
 			if (validPassword) {
@@ -55,18 +68,10 @@ passport.use(new LocalStrategy(
 			}
 			return done(null, false)
 		})
-		.catch(error => done(error, false)) //user not found
+		.catch(error => done(error, false)) //password doesn't match
 	})
+	.catch(error => done(error, false)) //database fetch error
+	
 }))
-
-
-
-
-
-
-
-
-
-
 
 
