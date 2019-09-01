@@ -60,11 +60,11 @@ passport.use(new LocalStrategy(
 		if (validUser.length == 0){
 			return done(null, false) //user not found
 		}
-		console.log(password);
 		bcrypt.compare(password, validUser[0].password)
 		.then(validPassword => {
 			if (validPassword) {
-				return done(null, validUser)
+				console.log(validUser[0])
+				return done(null, validUser[0])
 			}
 			return done(null, false)
 		})
@@ -73,5 +73,4 @@ passport.use(new LocalStrategy(
 	.catch(error => done(error, false)) //database fetch error
 	
 }))
-
 

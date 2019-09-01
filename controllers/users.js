@@ -15,10 +15,17 @@ signToken = user => {
 
 const login = (req, res, next) => {
 	const {email, username, password} = req.user;
-	res.cookie('access_token', signToken({email, username, password}))
-		// httpOnly: true //prevent javascript access to cookie on front-end 
-	res.status(200).json({success: true})
+	db.select('username', 'email', 'first_name', 'last_name', 'face_shape', 'hair_type', 'hair_length').from('users').where('username', username)
+	.then((user) => {
+		res.cookie('access_token', signToken({email, username, password}))
+			// httpOnly: true //prevent javascript access to cookie on front-end 
+		res.status(200).json(user)
 	// res.json({token: signToken({email, username, password})})
+	})
+	.catch(err => {
+      console.log(err);
+      res.status(500).json({ error: err });
+    });
 }
 
 //create user and send token to client
@@ -64,21 +71,20 @@ const login = (req, res, next) => {
 	})
 }
 
-const signOut = (req, res, next) => {
+const signout = (req, res, next) => {
 	res.clearCookie('access_token'); //clear cookie
-
+	res.status(200).json({success: true})
 }
 
 const checkAuth = (req, res, next) => {
 	console.log('I managed to get to checkAuth');
 	res.json({success: true});
-
 }
 
 
 
 
-module.exports = {register, login, signOut, checkAuth}
+module.exports = {register, login, signout, checkAuth}
 
 
 

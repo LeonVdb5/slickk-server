@@ -30,6 +30,8 @@ router.post('/login', passport.authenticate('local', {session: false}), UserCont
 
 router.post('/register', UserControllers.register);
 
+router.post('/signout', UserControllers.signout);
+
 // //route for UI to check if cookies exist 
 router.get('/status', passport.authenticate('jwt', {session: false}), UserControllers.checkAuth);
 
