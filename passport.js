@@ -22,16 +22,14 @@ const cookieExtrator = req => {
 //options for JwtStrategy 
 const opts = {
 	jwtFromRequest: cookieExtrator, //where is token contained (i.e., in the authorization field of the header)
-	secretOrKey: 'temp'
+	secretOrKey: 'temp',
 }
 
 
 // json web token strategy 
 passport.use(new JwtStrategy(opts, (payload, done) => { //payload is an object literal containing the unecoded payload data
 	//find user specified in token
-	console.log('Im in the JWT Strategy');
 	console.log(payload);
-	console.log(payload.sub);
 	db('users').where('username', payload.sub)
 	.then(validUser => { 
 		if (validUser.length == 0){
@@ -52,7 +50,7 @@ passport.use(new JwtStrategy(opts, (payload, done) => { //payload is an object l
 // output a user 
 
 passport.use(new LocalStrategy(
- (username, password, done) => {
+(username, password, done) => {
 	//Find user given username
 	db('users').where('username', username)
 	.then(validUser => { 
@@ -60,10 +58,10 @@ passport.use(new LocalStrategy(
 		if (validUser.length == 0){
 			return done(null, false) //user not found
 		}
+		console.log(password);
 		bcrypt.compare(password, validUser[0].password)
 		.then(validPassword => {
 			if (validPassword) {
-				console.log(validUser[0])
 				return done(null, validUser[0])
 			}
 			return done(null, false)
@@ -73,4 +71,3 @@ passport.use(new LocalStrategy(
 	.catch(error => done(error, false)) //database fetch error
 	
 }))
-
